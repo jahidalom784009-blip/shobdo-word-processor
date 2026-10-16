@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="bn">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#2563eb"><meta name="description" content="বাংলা ও ইংরেজি লেখার ব্যক্তিগত ওয়ার্ড প্রসেসর">
+<link rel="manifest" href="manifest.json"><link rel="icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Noto+Sans+Bengali:wght@400;500;600;700&family=Noto+Serif+Bengali:wght@400;500;600;700&family=Tiro+Bangla&display=swap" rel="stylesheet">
+<title>শব্দ — Personal Word Processor</title>
+<style>
+:root{--bg:#f1f5f9;--panel:#fff;--ink:#172033;--line:#d8dee9;--blue:#2563eb}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px system-ui,"Noto Sans Bengali",sans-serif}body.dark{--bg:#111827;--panel:#1f2937;--ink:#e5e7eb;--line:#374151}
+header{position:sticky;top:0;z-index:5;background:var(--panel);border-bottom:1px solid var(--line);padding:10px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.brand{font-weight:800;color:var(--blue);font-size:18px}.title{flex:1;min-width:140px;padding:9px;border:1px solid var(--line);border-radius:8px;background:var(--panel);color:var(--ink)}
+button,select,input,.filelabel{font:inherit;border:1px solid var(--line);border-radius:7px;padding:8px;background:var(--panel);color:var(--ink)}button{cursor:pointer}button:active{transform:scale(.98)}.primary{background:var(--blue);color:white;border-color:var(--blue)}
+.toolbar{position:sticky;top:58px;z-index:4;background:var(--panel);padding:8px;display:flex;gap:6px;flex-wrap:wrap;border-bottom:1px solid var(--line)}.toolbar select{max-width:145px}.toolbar button{min-width:36px;padding:7px}
+main{padding:14px 8px 60px;overflow:auto}.settings{max-width:900px;margin:0 auto 12px;background:var(--panel);padding:10px;border:1px solid var(--line);border-radius:10px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}.settings label{display:flex;align-items:center;gap:5px;font-size:13px}.settings input[type=number]{width:75px}.status{font-size:12px;color:#64748b;margin-left:auto}
+#paperWrap{display:flex;justify-content:center;align-items:flex-start;overflow:visible}.paper{background:#fff;color:#111;box-shadow:0 4px 24px #0002;transform-origin:top center;flex:none;position:relative;padding:20mm;outline:none;overflow:hidden;overflow-wrap:anywhere;line-height:1.55;white-space:normal}
+#editor{min-height:100%;outline:none;word-break:normal;overflow-wrap:anywhere}#editor:empty:before{content:"এখানে লেখা শুরু করুন… / Start writing here…";color:#9ca3af}
+.panel{max-width:900px;margin:12px auto;background:var(--panel);padding:12px;border:1px solid var(--line);border-radius:10px}.panel h3{margin:0 0 8px}.fontrow{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--line);gap:8px}.hidden{display:none!important}.hint{font-size:12px;color:#64748b}
+@media(max-width:600px){header{top:0;padding:7px}.toolbar{top:58px;gap:4px;padding:6px}.toolbar select{max-width:120px}.toolbar button{padding:6px;min-width:32px}main{padding:10px 0}.settings,.panel{margin-left:8px;margin-right:8px}.status{width:100%;margin-left:0}}
+</style>
+</head>
+<body>
+<header><span class="brand">শব্দ</span><input id="docTitle" class="title" value="আমার ডকুমেন্ট" aria-label="ডকুমেন্টের নাম"><button id="themeBtn">🌙 থিম</button><button class="primary" id="pdfBtn">PDF সংরক্ষণ</button></header>
+<nav class="toolbar" aria-label="Formatting toolbar">
+<button title="Undo" onclick="cmd('undo')">↶</button><button title="Redo" onclick="cmd('redo')">↷</button>
+<select id="blockType" aria-label="Heading"><option value="P">সাধারণ লেখা</option><option value="H1">শিরোনাম ১</option><option value="H2">শিরোনাম ২</option><option value="H3">শিরোনাম ৩</option><option value="BLOCKQUOTE">উদ্ধৃতি</option></select>
+<select id="fontSelect" aria-label="Font"><option value="Noto Sans Bengali">Noto Sans Bengali</option><option value="Hind Siliguri">Hind Siliguri</option><option value="Noto Serif Bengali">Noto Serif Bengali</option><option value="Tiro Bangla">Tiro Bangla</option><option value="Arial">Arial</option><option value="Georgia">Georgia</option><option value="Times New Roman">Times New Roman</option></select>
+<select id="fontSize" aria-label="Font size"><option value="2">12 px</option><option value="3" selected>16 px</option><option value="4">18 px</option><option value="5">24 px</option><option value="6">32 px</option><option value="7">48 px</option></select>
+<button onclick="cmd('bold')" title="Bold"><b>B</b></button><button onclick="cmd('italic')" title="Italic"><i>I</i></button><button onclick="cmd('underline')" title="Underline"><u>U</u></button>
+<label title="Text color" style="display:flex;align-items:center;gap:4px"><input id="textColor" type="color" value="#111111" style="width:38px;padding:3px;height:35px"><input id="hexColor" type="text" value="#111111" maxlength="7" aria-label="Hex color code" placeholder="#RRGGBB" style="width:94px;padding:7px" title="Hex color code যেমন #1826FE"></label>
+<button onclick="cmd('justifyLeft')" title="Left">☰←</button><button onclick="cmd('justifyCenter')" title="Center">☷</button><button onclick="cmd('justifyRight')" title="Right">→☰</button><button onclick="cmd('justifyFull')" title="Justify">☰</button>
+<button onclick="cmd('insertUnorderedList')" title="Bullets">• List</button><button onclick="cmd('insertOrderedList')" title="Numbered">1. List</button>
+</nav>
+<main>
+<section class="settings">
+<label>পেজ <select id="preset"><option value="A4">A4</option><option value="A3">A3</option><option value="A5">A5</option><option value="B5">B5</option><option value="Letter">Letter</option><option value="Legal">Legal</option><option value="custom">Custom</option></select></label>
+<label>দিক <select id="orientation"><option value="portrait">Portrait</option><option value="landscape">Landscape</option></select></label>
+<label>প্রস্থ <input id="pageW" type="number" value="210" min="10" max="2000"></label><label>উচ্চতা <input id="pageH" type="number" value="297" min="10" max="3000"></label>
+<label>একক <select id="unit"><option value="mm">mm</option><option value="cm">cm</option><option value="in">inch</option><option value="px">px</option></select></label>
+<span id="saveStatus" class="status">অটো-সেভ চালু</span>
+</section>
+<div id="paperWrap"><article class="paper" id="paper"><div id="editor" contenteditable="true" spellcheck="true" lang="bn" aria-label="Document editor"></div></article></div>
+<section class="panel"><h3>ফন্ট ম্যানেজার</h3><p class="hint">TTF, OTF, WOFF বা WOFF2 ফন্ট যোগ করুন। ফন্ট আপনার ডিভাইসের IndexedDB-তে থাকবে।</p><label class="filelabel">＋ ফন্ট যোগ করুন <input id="fontFiles" type="file" accept=".ttf,.otf,.woff,.woff2,font/*" multiple hidden></label><div id="fontList"></div></section>
+<section class="panel"><h3>ব্যবহার নির্দেশনা</h3><p class="hint">লেখা স্বয়ংক্রিয়ভাবে এই ব্রাউজারে সেভ হয়। PDF বানানোর সময় পেজের দৃশ্যমান লেখা ছবি হিসেবে PDF-এ বসে, তাই বাংলা যুক্তাক্ষর ও ফন্টের চেহারা অক্ষত রাখার চেষ্টা করা হয়; PDF-এর টেক্সট নির্বাচন/সার্চ করা নাও যেতে পারে। বড় ডকুমেন্টের আগে পরীক্ষা করুন।</p></section>
+</main>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+const $=id=>document.getElementById(id), editor=$('editor'), paper=$('paper');
+const presets={A3:[297,420],A4:[210,297],A5:[148,210],B5:[176,250],Letter:[215.9,279.4],Legal:[215.9,355.6]};
+let db;
+function cmd(c,v=null){editor.focus();document.execCommand(c,false,v);saveDoc()}
+$('blockType').onchange=e=>{editor.focus();document.execCommand('formatBlock',false,e.target.value);saveDoc()};
+$('fontSelect').onchange=e=>{editor.focus();document.execCommand('fontName',false,e.target.value);saveDoc()};
+$('fontSize').onchange=e=>{editor.focus();document.execCommand('fontSize',false,e.target.value);saveDoc()};
+$('textColor').oninput=e=>{$('hexColor').value=e.target.value.toUpperCase();editor.focus();document.execCommand('foreColor',false,e.target.value);saveDoc()};
+$('hexColor').onchange=e=>{let v=e.target.value.trim();if(/^#[0-9a-fA-F]{6}$/.test(v)){$('textColor').value=v;editor.focus();document.execCommand('foreColor',false,v);e.target.value=v.toUpperCase();saveDoc()}else{alert('সঠিক HEX কোড দিন, যেমন #1826FE');e.target.value=$('textColor').value.toUpperCase()}};
+$('hexColor').addEventListener('keydown',e=>{if(e.key==='Enter'){$('hexColor').dispatchEvent(new Event('change'))}});
+['input','keyup','paste'].forEach(ev=>editor.addEventListener(ev,saveDoc));
+$('docTitle').addEventListener('input',saveDoc);
+$('themeBtn').onclick=()=>{document.body.classList.toggle('dark');localStorage.setItem('sw-dark',document.body.classList.contains('dark'));$('themeBtn').textContent=document.body.classList.contains('dark')?'☀️ থিম':'🌙 থিম'};
+if(localStorage.getItem('sw-dark')==='true'){$('themeBtn').click()}
+let saveTimer;
+function saveDoc(){clearTimeout(saveTimer);$('saveStatus').textContent='সেভ হচ্ছে…';saveTimer=setTimeout(()=>{try{localStorage.setItem('sw-doc',JSON.stringify({title:$('docTitle').value,html:editor.innerHTML,preset:$('preset').value,orientation:$('orientation').value,w:$('pageW').value,h:$('pageH').value,unit:$('unit').value}));$('saveStatus').textContent='সেভ হয়েছে ✓'}catch(e){$('saveStatus').textContent='সেভ করা যায়নি'}} ,250)}
+try{const d=JSON.parse(localStorage.getItem('sw-doc')||'{}');if(d.title)$('docTitle').value=d.title;if(d.html)editor.innerHTML=d.html;if(d.preset)$('preset').value=d.preset;if(d.orientation)$('orientation').value=d.orientation;if(d.w)$('pageW').value=d.w;if(d.h)$('pageH').value=d.h;if(d.unit)$('unit').value=d.unit}catch(e){}
+function mm(v,u){return u==='mm'?v:u==='cm'?v*10:u==='in'?v*25.4:v*25.4/96}
+function applyPage(){let w=mm(+$('pageW').value,$('unit').value),h=mm(+$('pageH').value,$('unit').value);if($('orientation').value==='landscape')[w,h]=[h,w];let cssW=w*96/25.4,cssH=h*96/25.4;paper.style.width=cssW+'px';paper.style.minHeight=cssH+'px';paper.style.padding=Math.min(20,Math.max(10,w*.07))+'mm';editor.style.minHeight=(cssH-40)+'px';let scale=Math.min(1,(window.innerWidth-20)/cssW);paper.style.transform=`scale(${scale})`;paper.style.marginBottom=(cssH*scale-cssH)+'px';paper.dataset.w=w;paper.dataset.h=h;saveDoc()}
+$('preset').onchange=()=>{if(presets[$('preset').value]){$('unit').value='mm';$('pageW').value=presets[$('preset').value][0];$('pageH').value=presets[$('preset').value][1]}applyPage()};
+['orientation','pageW','pageH','unit'].forEach(id=>$(id).addEventListener('change',()=>{$('preset').value='custom';applyPage()}));
+window.addEventListener('resize',applyPage);applyPage();
+// Font storage in IndexedDB
+function openDB(){return new Promise((res,rej)=>{let r=indexedDB.open('ShobdoFonts',1);r.onupgradeneeded=()=>r.result.createObjectStore('fonts',{keyPath:'name'});r.onsuccess=()=>{db=r.result;res(db)};r.onerror=()=>rej(r.error)})}
+function tx(mode){return db.transaction('fonts',mode).objectStore('fonts')}
+async function loadFonts(){try{await openDB();tx('readonly').getAll().onsuccess=e=>{for(const f of e.target.result)installFont(f);renderFontList(e.target.result)}}catch(e){console.warn(e)}}
+function installFont(f){try{const face=new FontFace(f.name,f.blob);face.load().then(ff=>{document.fonts.add(ff);if(!$('fontSelect').querySelector(`[value="${CSS.escape(f.name)}"]`))$('fontSelect').add(new Option(f.name,f.name));}).catch(console.warn)}catch(e){}}
+function renderFontList(list){$('fontList').innerHTML='';list.forEach(f=>{let row=document.createElement('div');row.className='fontrow';let label=document.createElement('span');label.textContent=f.name;let b=document.createElement('button');b.textContent='削除';b.onclick=()=>{tx('readwrite').delete(f.name).onsuccess=()=>{document.fonts.forEach(face=>{if(face.family===f.name)document.fonts.delete(face)});[...$('fontSelect').options].forEach(o=>{if(o.value===f.name)o.remove()});loadFontList()}};row.append(label,b);$('fontList').append(row)})}
+function loadFontList(){tx('readonly').getAll().onsuccess=e=>renderFontList(e.target.result)}
+$('fontFiles').onchange=async e=>{await openDB();for(const file of e.target.files){let name=file.name.replace(/\.(ttf|otf|woff2?)$/i,'').replace(/[^\w \-()]/g,'').trim()||'Imported Font';let blob=file;let base=name,n=2;while(await new Promise(r=>{let q=tx('readonly').get(name);q.onsuccess=()=>r(!!q.result);q.onerror=()=>r(false)}))name=base+' '+n++;await new Promise((res,rej)=>{let q=tx('readwrite').put({name,blob,type:file.type});q.onsuccess=res;q.onerror=()=>rej(q.error)});installFont({name,blob})}loadFontList();e.target.value=''};
+loadFonts();
+// PDF export: render page at high scale; raster output preserves rendered Bangla shaping.
+$('pdfBtn').onclick=async()=>{let btn=$('pdfBtn');btn.disabled=true;btn.textContent='PDF তৈরি হচ্ছে…';try{await document.fonts.ready;const {jsPDF}=window.jspdf;if(!window.html2canvas||!jsPDF)throw Error('PDF লাইব্রেরি লোড হয়নি। প্রথমবার ইন্টারনেট চালু করে আবার চেষ্টা করুন।');let old=paper.style.transform,oldMargin=paper.style.marginBottom;paper.style.transform='none';paper.style.marginBottom='0';const canvas=await html2canvas(paper,{scale:2,backgroundColor:'#ffffff',useCORS:true,logging:false,windowWidth:paper.scrollWidth,windowHeight:paper.scrollHeight});paper.style.transform=old;paper.style.marginBottom=oldMargin;let w=+paper.dataset.w,h=+paper.dataset.h;let pdf=new jsPDF({orientation:w>h?'landscape':'portrait',unit:'mm',format:[w,h],compress:true});const pagePxH=Math.round(canvas.width*h/w);let y=0,first=true;while(y<canvas.height){let slice=document.createElement('canvas');slice.width=canvas.width;slice.height=Math.min(pagePxH,canvas.height-y);slice.getContext('2d').drawImage(canvas,0,y,canvas.width,slice.height,0,0,canvas.width,slice.height);if(!first)pdf.addPage([w,h],w>h?'landscape':'portrait');pdf.addImage(slice.toDataURL('image/jpeg',.94),'JPEG',0,0,w,h);y+=pagePxH;first=false}let filename=($('docTitle').value||'document').replace(/[\\/:*?"<>|]/g,'_');pdf.save(filename+'.pdf')}catch(err){alert('PDF তৈরি করা যায়নি: '+err.message)}finally{btn.disabled=false;btn.textContent='PDF সংরক্ষণ'}};
+if('serviceWorker'in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(console.warn));
+</script></body></html>
